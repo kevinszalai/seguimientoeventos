@@ -148,6 +148,15 @@
     width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--line);font-family:inherit;font-size:14px;margin-bottom:16px;
   }
   .modal input[type=text]:focus,.modal input[type=date]:focus{outline:none;border-color:var(--azul-principal);}
+  .modal select{
+    width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--line);font-family:inherit;font-size:14px;
+    margin-bottom:16px;background:#fff;color:var(--text);
+  }
+  .modal select:focus{outline:none;border-color:var(--azul-principal);}
+  .area-tag{
+    display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;
+    background:var(--azul-oscuro);color:#fff;margin-bottom:8px;letter-spacing:.2px;
+  }
   .color-picker{display:flex;gap:8px;margin-bottom:20px;}
   .color-swatch{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;}
   .color-swatch.selected{border-color:var(--azul-oscuro);transform:scale(1.08);}
@@ -221,6 +230,7 @@ const STATUSES = [
   {id:'listo',     label:'Listo',     color:'#008091'}
 ];
 const EVENT_COLORS = ['#00528F','#008091','#ff436e','#00C4DF','#002447'];
+const AREAS = ['Retail','Affinity','Brokers','GSA','Chile','Colombia','Panama','Mexico'];
 
 let state = { view:'menu', eventId:null, itemId:null };
 let events = [];
@@ -346,6 +356,7 @@ function renderMenu(){
           <button class="btn-icon" data-del-event="${ev.id}" title="Eliminar evento">✕</button>
         </div>
         <h3>${esc(ev.name)}</h3>
+        ${ev.area ? `<span class="area-tag">${esc(ev.area)}</span>` : ''}
         <div class="meta">${items.length} item${items.length===1?'':'s'}</div>
         ${pill}
         <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${ev.color}"></div></div>
@@ -403,6 +414,11 @@ function openEventModal(existingEvent){
       <h3>${isEdit ? 'Editar evento' : 'Nuevo evento'}</h3>
       <label>Nombre del evento</label>
       <input type="text" id="ev-name" placeholder="Ej: Lanzamiento Verano 2026" value="${isEdit ? esc(existingEvent.name) : ''}" />
+      <label>Área</label>
+      <select id="ev-area">
+        <option value="">Sin definir</option>
+        ${AREAS.map(a=>`<option value="${a}" ${isEdit && existingEvent.area===a ? 'selected':''}>${a}</option>`).join('')}
+      </select>
       <label>Fecha del evento (opcional)</label>
       <input type="date" id="ev-date" value="${isEdit ? (existingEvent.eventDate||'') : ''}" />
       <label>Color</label>
@@ -426,13 +442,15 @@ function openEventModal(existingEvent){
   document.getElementById('ev-save').onclick = async ()=>{
     const name = document.getElementById('ev-name').value.trim();
     const eventDate = document.getElementById('ev-date').value;
+    const area = document.getElementById('ev-area').value;
     if(!name){ showToast('Poné un nombre para el evento'); return; }
     if(isEdit){
       existingEvent.name = name;
       existingEvent.eventDate = eventDate;
+      existingEvent.area = area;
       existingEvent.color = chosen;
     } else {
-      const ev = {id:uid(), name, eventDate, color:chosen, createdAt:Date.now()};
+      const ev = {id:uid(), name, eventDate, area, color:chosen, createdAt:Date.now()};
       events.push(ev);
       itemsCache[ev.id] = [];
     }
