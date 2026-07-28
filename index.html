@@ -377,7 +377,6 @@ function renderMenu(){
   }
   const cards = events.map(ev=>{
     const items = itemsCache[ev.id] || [];
-    const pct = progressPct(items);
     const alert = eventAlert(ev.eventDate);
     let borderColor = ev.color;
     let pill = '';
@@ -402,8 +401,6 @@ function renderMenu(){
         ${ev.area ? `<span class="area-tag">${esc(ev.area)}</span>` : ''}
         <div class="meta">${items.length} item${items.length===1?'':'s'}</div>
         ${pill}
-        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${ev.color}"></div></div>
-        <div class="progress-label">${pct}% completado</div>
       </div>`;
   }).join('');
   return `
@@ -510,14 +507,15 @@ function renderEventView(items){
   const rows = items.length ? items.map(it=>{
     const st = statusInfo(it.status);
     const overdue = isOverdue(it.dueDate, it.status);
+    const dueBadge = it.dueDate ? `<span class="chip due-badge ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>` : '';
     const metaBits = [];
     if(it.assignee) metaBits.push(`<span class="chip">👤 ${esc(it.assignee)}</span>`);
-    if(it.dueDate) metaBits.push(`<span class="chip ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>`);
     return `
       <div class="item-block">
         <div class="item-row" data-id="${it.id}">
           <button class="btn-icon toggle-btn" data-toggle="${it.id}" title="Más información">▾</button>
           <div class="title">${esc(it.title)}</div>
+          ${dueBadge}
           <div class="item-meta">${metaBits.join('')}</div>
           <span class="status-pill" style="background:${st.color}22;color:${st.color}">
             <span class="dot" style="background:${st.color}"></span>${st.label}
@@ -633,9 +631,12 @@ function refreshItemRowMeta(id){
   const row = document.querySelector(`.item-row[data-id="${id}"]`);
   if(!it || !row) return;
   const overdue = isOverdue(it.dueDate, it.status);
+  const dueBadge = it.dueDate ? `<span class="chip due-badge ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>` : '';
+  const existingDue = row.querySelector('.due-badge');
+  if(existingDue) existingDue.outerHTML = dueBadge;
+  else if(dueBadge) row.querySelector('.title').insertAdjacentHTML('afterend', dueBadge);
   const metaBits = [];
   if(it.assignee) metaBits.push(`<span class="chip">👤 ${esc(it.assignee)}</span>`);
-  if(it.dueDate) metaBits.push(`<span class="chip ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>`);
   const metaEl = row.querySelector('.item-meta');
   if(metaEl) metaEl.innerHTML = metaBits.join('');
 }
@@ -648,18 +649,8 @@ function renderExpandContent(it, detail){
   const hasContent = detail.content && !isPlaceholder && plainText.length > 0;
   const imgCount = (detail.content && detail.content.match(/<img/g) || []).length;
   return `
-    <div class="expand-edit-row">
-      <div class="expand-field">
-        <label>Responsable</label>
-        <input type="text" data-expand-assignee="${it.id}" placeholder="Sin asignar" value="${esc(it.assignee||'')}" />
-      </div>
-      <div class="expand-field">
-        <label>Fecha límite</label>
-        <input type="date" data-expand-due="${it.id}" value="${it.dueDate||''}" />
-      </div>
-      ${imgCount ? `<div class="expand-field"><label>Imágenes</label><span style="font-size:12.5px;padding-top:4px;">${imgCount}</span></div>` : ''}
-    </div>
-    <div class="expand-preview">
+    ${imgCount ? `<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:8px;">🖼 ${imgCount} imagen${imgCount===1?'':'es'}</div>` : ''}
+    <div class="expand-preview" style="${imgCount?'margin-top:0;padding-top:0;border-top:none;':''}">
       ${hasContent
         ? `<div class="expand-content-preview">${detail.content}</div>`
         : `<i>Todavía no hay descripción cargada.</i>`}
