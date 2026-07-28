@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --azul-principal:#00528F;
@@ -240,13 +242,29 @@ let savedRange = null; // last selection inside editor
 function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
 
-async function safeGet(key, shared){
-  try{ const r = await window.storage.get(key, shared); return r ? JSON.parse(r.value) : null; }
-  catch(e){ return null; }
+const firebaseConfig = {
+  apiKey: "AIzaSyAdbCg3Xw4mAg6v23sOOb2_2yfwbE-gZns",
+  authDomain: "uaproyectos.firebaseapp.com",
+  projectId: "uaproyectos",
+  storageBucket: "uaproyectos.firebasestorage.app",
+  messagingSenderId: "625931673195",
+  appId: "1:625931673195:web:60ec6fd8f18b8ddd6e1b2e"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COLLECTION = 'eventos_tracking';
+
+async function safeGet(key){
+  try{
+    const doc = await db.collection(COLLECTION).doc(key).get();
+    return doc.exists ? doc.data().value : null;
+  }catch(e){ console.error('firestore get error', key, e); return null; }
 }
-async function safeSet(key, value, shared){
-  try{ await window.storage.set(key, JSON.stringify(value), shared); return true; }
-  catch(e){ console.error('storage error', e); return false; }
+async function safeSet(key, value){
+  try{
+    await db.collection(COLLECTION).doc(key).set({value: value, updatedAt: Date.now()});
+    return true;
+  }catch(e){ console.error('firestore set error', key, e); return false; }
 }
 
 function statusInfo(id){ return STATUSES.find(s=>s.id===id) || STATUSES[0]; }
@@ -704,7 +722,9 @@ function bindItemView(detail){
   editor.addEventListener('input', ()=>{
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async ()=>{
-      await safeSet('itemdetail:'+state.eventId+':'+state.itemId, {content: editor.innerHTML}, true);
+      const html = editor.innerHTML;
+      if(html.length > 850000){ showToast('⚠ La descripción está muy pesada (muchas imágenes). Considerá sacar alguna.'); }
+      await safeSet('itemdetail:'+state.eventId+':'+state.itemId, {content: html}, true);
       flashSaved();
     }, 600);
   });
@@ -776,15 +796,29 @@ function applyHighlight(){
 function insertImageFile(file, editor){
   const reader = new FileReader();
   reader.onload = ()=>{
-    editor.focus();
-    restoreSelectionRange();
-    document.execCommand('insertImage', false, reader.result);
-    triggerEditorSave(editor);
+    const img = new Image();
+    img.onload = ()=>{
+      const MAX_W = 1100;
+      const scale = Math.min(1, MAX_W / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      editor.focus();
+      restoreSelectionRange();
+      document.execCommand('insertImage', false, dataUrl);
+      triggerEditorSave(editor);
+    };
+    img.src = reader.result;
   };
   reader.readAsDataURL(file);
 }
 function triggerEditorSave(editor){
-  safeSet('itemdetail:'+state.eventId+':'+state.itemId, {content: editor.innerHTML}, true).then(flashSaved);
+  const html = editor.innerHTML;
+  if(html.length > 850000){ showToast('⚠ La descripción está muy pesada (muchas imágenes). Considerá sacar alguna.'); }
+  safeSet('itemdetail:'+state.eventId+':'+state.itemId, {content: html}, true).then(flashSaved);
 }
 function flashSaved(){
   const f = document.getElementById('save-flag');
