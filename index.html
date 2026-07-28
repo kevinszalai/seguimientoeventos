@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seguimiento de Eventos · Universal Assistance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul-principal:#00528F;
+    --teal:#008091;
+    --azul-oscuro:#002447;
+    --cyan:#00C4DF;
+    --fucsia:#ff436e;
+    --alert-yellow:#F5A400;
+    --alert-red:#E23D46;
+    --bg:#F3F6F8;
+    --card:#FFFFFF;
+    --line:#E2E8ED;
+    --text:#0F2233;
+    --text-soft:#5A6B78;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(0,36,71,0.06), 0 8px 24px rgba(0,36,71,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  #app{max-width:980px;margin:0 auto;padding:0 20px 80px;}
+
+  /* Header */
+  header.topbar{
+    background:linear-gradient(135deg,var(--azul-oscuro),var(--azul-principal));
+    color:#fff;
+    padding:22px 20px;
+    margin-bottom:24px;
+  }
+  .topbar-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+  .logo-mark{
+    width:40px;height:40px;border-radius:10px;
+    background:linear-gradient(135deg,var(--teal),var(--cyan));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:15px;letter-spacing:0.5px;color:var(--azul-oscuro);
+    flex-shrink:0;
+  }
+  .topbar-titles h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px;}
+  .topbar-titles p{font-size:12.5px;margin:2px 0 0;color:#BFDDEE;font-weight:500;}
+  .crumb{
+    display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--text-soft);
+    margin-bottom:16px;flex-wrap:wrap;
+  }
+  .crumb button{
+    background:none;border:none;color:var(--azul-principal);font-weight:600;font-size:13.5px;
+    cursor:pointer;padding:4px 2px;font-family:inherit;
+  }
+  .crumb button:hover{text-decoration:underline;}
+  .crumb .sep{color:#B7C4CD;}
+  .crumb .current{color:var(--text);font-weight:600;}
+
+  /* Buttons */
+  .btn{
+    font-family:inherit;border:none;border-radius:10px;padding:10px 16px;
+    font-weight:600;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .06s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:#00707e;}
+  .btn-ghost{background:#fff;color:var(--azul-principal);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--azul-principal);}
+  .btn-icon{background:none;border:none;cursor:pointer;color:var(--text-soft);padding:6px;border-radius:8px;font-size:15px;line-height:1;}
+  .btn-icon:hover{background:#EEF3F6;color:var(--fucsia);}
+
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .section-head h2{font-size:20px;margin:0;font-weight:700;}
+
+  /* Event grid */
+  .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .event-card{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px;cursor:pointer;position:relative;border-top:5px solid var(--azul-principal);
+    transition:transform .12s ease;
+  }
+  .event-card:hover{transform:translateY(-3px);}
+  .card-actions{position:absolute;top:12px;right:10px;display:flex;gap:2px;}
+  .event-card h3{margin:0 0 4px;font-size:16px;font-weight:700;padding-right:44px;}
+  .event-card .meta{font-size:12.5px;color:var(--text-soft);margin-bottom:10px;}
+  .countdown-pill{
+    display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;
+    padding:4px 10px;border-radius:20px;margin-bottom:12px;
+  }
+  .progress-track{height:6px;border-radius:4px;background:#E9EEF1;overflow:hidden;margin-bottom:6px;}
+  .progress-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .3s ease;}
+  .progress-label{font-size:11px;color:var(--text-soft);font-weight:600;}
+
+  .empty-state{
+    background:var(--card);border:1.5px dashed var(--line);border-radius:var(--radius);
+    padding:40px 20px;text-align:center;color:var(--text-soft);font-size:14px;
+  }
+
+  /* Item list */
+  .items-list{display:flex;flex-direction:column;gap:10px;}
+  .item-row{
+    background:var(--card);border-radius:12px;box-shadow:var(--shadow);
+    padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;
+  }
+  .item-row:hover{outline:1.5px solid var(--cyan);}
+  .item-row .title{flex:1;font-weight:600;font-size:14.5px;min-width:120px;}
+  .item-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--text-soft);white-space:nowrap;}
+  .item-meta .chip{display:inline-flex;align-items:center;gap:4px;}
+  .item-meta .chip.overdue{color:var(--fucsia);font-weight:700;}
+  .status-pill{
+    font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .status-pill .dot{width:7px;height:7px;border-radius:50%;}
+  .toggle-btn{flex-shrink:0;}
+  .item-block{display:flex;flex-direction:column;}
+  .item-expand{
+    display:none;background:#FAFBFC;border:1.5px solid var(--line);border-top:none;
+    border-radius:0 0 12px 12px;margin-top:-8px;padding:14px 18px 16px;font-size:13px;color:var(--text-soft);
+  }
+  .item-expand.show{display:block;}
+  .expand-row{display:flex;gap:8px;margin-bottom:6px;}
+  .expand-row b{color:var(--text);font-weight:600;min-width:100px;flex-shrink:0;}
+  .expand-preview{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);line-height:1.5;}
+  .expand-link{
+    display:inline-block;margin-top:10px;color:var(--azul-principal);font-weight:600;font-size:12.5px;
+    cursor:pointer;background:none;border:none;font-family:inherit;padding:0;
+  }
+  .expand-link:hover{text-decoration:underline;}
+
+  /* Modal */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,36,71,0.45);display:flex;align-items:center;justify-content:center;
+    z-index:50;padding:16px;
+  }
+  .modal{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+  .modal h3{margin:0 0 16px;font-size:17px;}
+  .modal label{font-size:12.5px;font-weight:600;color:var(--text-soft);display:block;margin-bottom:6px;}
+  .modal input[type=text],.modal input[type=date]{
+    width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--line);font-family:inherit;font-size:14px;margin-bottom:16px;
+  }
+  .modal input[type=text]:focus,.modal input[type=date]:focus{outline:none;border-color:var(--azul-principal);}
+  .color-picker{display:flex;gap:8px;margin-bottom:20px;}
+  .color-swatch{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;}
+  .color-swatch.selected{border-color:var(--azul-oscuro);transform:scale(1.08);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+
+  /* Item detail view */
+  .item-detail-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;}
+  .item-title-input{
+    width:100%;font-size:21px;font-weight:700;border:none;background:none;font-family:inherit;
+    padding:4px 0;margin-bottom:6px;color:var(--text);
+  }
+  .item-title-input:focus{outline:none;border-bottom:2px solid var(--cyan);}
+  .status-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .status-row label{font-size:12.5px;font-weight:600;color:var(--text-soft);}
+  .meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px;}
+  .meta-field{display:flex;flex-direction:column;gap:5px;}
+  .meta-field label{font-size:12.5px;font-weight:600;color:var(--text-soft);}
+  .meta-field input{
+    font-family:inherit;font-size:13.5px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);
+  }
+  .meta-field input:focus{outline:none;border-color:var(--azul-principal);}
+  .status-options{display:flex;gap:6px;flex-wrap:wrap;}
+  .status-opt{
+    font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;border:1.5px solid transparent;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .status-opt .dot{width:7px;height:7px;border-radius:50%;}
+  .status-opt.active{border-color:var(--azul-oscuro);}
+
+  .toolbar{display:flex;gap:4px;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:10px 10px 0 0;padding:6px;background:#FAFBFC;}
+  .tb-btn{
+    background:none;border:none;padding:8px 11px;border-radius:7px;cursor:pointer;font-size:13.5px;color:var(--text);font-family:inherit;font-weight:600;
+  }
+  .tb-btn:hover{background:#E9EEF1;}
+  .tb-sep{width:1px;background:var(--line);margin:4px 4px;}
+  .editor{
+    border:1.5px solid var(--line);border-top:none;border-radius:0 0 10px 10px;
+    min-height:260px;padding:16px;font-size:14.5px;line-height:1.65;
+  }
+  .editor:focus{outline:none;}
+  .editor img{max-width:100%;border-radius:8px;margin:8px 0;display:block;}
+  .editor ul{padding-left:20px;}
+  .editor mark{background:#FFE38A;padding:0 2px;border-radius:2px;}
+  .save-flag{font-size:12px;color:var(--teal);font-weight:600;height:16px;margin-top:8px;opacity:0;transition:opacity .3s;}
+  .save-flag.show{opacity:1;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--azul-oscuro);color:#fff;padding:10px 18px;border-radius:10px;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow);z-index:100;
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo-mark">ua</div>
+    <div class="topbar-titles">
+      <h1>Seguimiento de Eventos</h1>
+      <p>Universal Assistance · Uso interno</p>
+    </div>
+  </div>
+</header>
+<div id="app"></div>
+
+<script>
+const STATUSES = [
+  {id:'pendiente', label:'Pendiente', color:'#94A3B8'},
+  {id:'en_curso',  label:'En curso',  color:'#00C4DF'},
+  {id:'revision',  label:'Revisión',  color:'#ff436e'},
+  {id:'listo',     label:'Listo',     color:'#008091'}
+];
+const EVENT_COLORS = ['#00528F','#008091','#ff436e','#00C4DF','#002447'];
+
+let state = { view:'menu', eventId:null, itemId:null };
+let events = [];
+let itemsCache = {};   // eventId -> items array
+let savedRange = null; // last selection inside editor
+
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+async function safeGet(key, shared){
+  try{ const r = await window.storage.get(key, shared); return r ? JSON.parse(r.value) : null; }
+  catch(e){ return null; }
+}
+async function safeSet(key, value, shared){
+  try{ await window.storage.set(key, JSON.stringify(value), shared); return true; }
+  catch(e){ console.error('storage error', e); return false; }
+}
+
+function statusInfo(id){ return STATUSES.find(s=>s.id===id) || STATUSES[0]; }
+
+function formatDate(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function isOverdue(iso, status){
+  if(!iso || status==='listo') return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return new Date(iso+'T00:00:00') < today;
+}
+function daysUntil(iso){
+  if(!iso) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(iso+'T00:00:00');
+  return Math.round((target - today)/86400000);
+}
+function eventAlert(iso){
+  const d = daysUntil(iso);
+  if(d===null) return {level:null, days:null};
+  if(d<0) return {level:'past', days:d};
+  if(d<=25) return {level:'red', days:d};
+  if(d<=30) return {level:'yellow', days:d};
+  return {level:null, days:d};
+}
+
+function progressPct(items){
+  if(!items || !items.length) return 0;
+  const done = items.filter(i=>i.status==='listo').length;
+  return Math.round((done/items.length)*100);
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+/* ---------- Data loading ---------- */
+async function loadEvents(){
+  events = (await safeGet('events', true)) || [];
+}
+async function loadItems(eventId){
+  if(itemsCache[eventId]) return itemsCache[eventId];
+  const items = (await safeGet('items:'+eventId, true)) || [];
+  itemsCache[eventId] = items;
+  return items;
+}
+async function saveItemsFor(eventId){
+  await safeSet('items:'+eventId, itemsCache[eventId], true);
+}
+
+/* ---------- Render root ---------- */
+async function render(){
+  const app = document.getElementById('app');
+  if(state.view === 'menu'){
+    app.innerHTML = renderMenu();
+    bindMenu();
+  } else if(state.view === 'event'){
+    const items = await loadItems(state.eventId);
+    app.innerHTML = renderEventView(items);
+    bindEventView();
+  } else if(state.view === 'item'){
+    const items = await loadItems(state.eventId);
+    const item = items.find(i=>i.id===state.itemId);
+    const detail = (await safeGet('itemdetail:'+state.eventId+':'+state.itemId, true)) || {content:''};
+    app.innerHTML = renderItemView(item, detail);
+    bindItemView(detail);
+  }
+}
+
+/* ---------- Menu (events) ---------- */
+function renderMenu(){
+  if(!events.length){
+    return `
+      <div class="section-head"><h2>Eventos</h2>
+        <button class="btn btn-primary" id="btn-new-event">+ Nuevo evento</button>
+      </div>
+      <div class="empty-state">Todavía no hay eventos cargados.<br>Creá el primero para empezar a hacer seguimiento.</div>
+    `;
+  }
+  const cards = events.map(ev=>{
+    const items = itemsCache[ev.id] || [];
+    const pct = progressPct(items);
+    const alert = eventAlert(ev.eventDate);
+    let borderColor = ev.color;
+    let pill = '';
+    if(alert.level==='red'){
+      borderColor = 'var(--alert-red)';
+      pill = `<span class="countdown-pill" style="background:#E23D4622;color:var(--alert-red)">⚠ Faltan ${alert.days} día${alert.days===1?'':'s'}</span>`;
+    } else if(alert.level==='yellow'){
+      borderColor = 'var(--alert-yellow)';
+      pill = `<span class="countdown-pill" style="background:#F5A40022;color:var(--alert-yellow)">⏳ Faltan ${alert.days} días</span>`;
+    } else if(alert.level==='past'){
+      pill = `<span class="countdown-pill" style="background:#E9EEF1;color:var(--text-soft)">Evento pasado</span>`;
+    } else if(alert.days!==null){
+      pill = `<span class="countdown-pill" style="background:#E9EEF1;color:var(--text-soft)">Faltan ${alert.days} días</span>`;
+    }
+    return `
+      <div class="event-card" style="border-top-color:${borderColor}" data-id="${ev.id}">
+        <div class="card-actions">
+          <button class="btn-icon" data-edit-event="${ev.id}" title="Editar evento">✎</button>
+          <button class="btn-icon" data-del-event="${ev.id}" title="Eliminar evento">✕</button>
+        </div>
+        <h3>${esc(ev.name)}</h3>
+        <div class="meta">${items.length} item${items.length===1?'':'s'}</div>
+        ${pill}
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${ev.color}"></div></div>
+        <div class="progress-label">${pct}% completado</div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="section-head"><h2>Eventos</h2>
+      <button class="btn btn-primary" id="btn-new-event">+ Nuevo evento</button>
+    </div>
+    <div class="events-grid">${cards}</div>
+  `;
+}
+
+async function preloadItemCounts(){
+  await Promise.all(events.map(ev=>loadItems(ev.id)));
+}
+
+function bindMenu(){
+  document.getElementById('btn-new-event').onclick = ()=>openEventModal();
+  document.querySelectorAll('.event-card').forEach(card=>{
+    card.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-del-event]')) return;
+      state.view='event'; state.eventId=card.dataset.id; render();
+    });
+  });
+  document.querySelectorAll('[data-edit-event]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const ev = events.find(x=>x.id===btn.dataset.editEvent);
+      openEventModal(ev);
+    });
+  });
+  document.querySelectorAll('[data-del-event]').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.delEvent;
+      const ev = events.find(x=>x.id===id);
+      if(!confirm(`¿Eliminar el evento "${ev.name}" y todos sus items?`)) return;
+      events = events.filter(x=>x.id!==id);
+      await safeSet('events', events, true);
+      delete itemsCache[id];
+      render();
+    });
+  });
+}
+
+function openEventModal(existingEvent){
+  const isEdit = !!existingEvent;
+  let chosen = existingEvent ? existingEvent.color : EVENT_COLORS[0];
+  const back = document.createElement('div');
+  back.className='modal-backdrop';
+  back.innerHTML = `
+    <div class="modal">
+      <h3>${isEdit ? 'Editar evento' : 'Nuevo evento'}</h3>
+      <label>Nombre del evento</label>
+      <input type="text" id="ev-name" placeholder="Ej: Lanzamiento Verano 2026" value="${isEdit ? esc(existingEvent.name) : ''}" />
+      <label>Fecha del evento (opcional)</label>
+      <input type="date" id="ev-date" value="${isEdit ? (existingEvent.eventDate||'') : ''}" />
+      <label>Color</label>
+      <div class="color-picker">
+        ${EVENT_COLORS.map(c=>`<div class="color-swatch ${c===chosen?'selected':''}" style="background:${c}" data-color="${c}"></div>`).join('')}
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="ev-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="ev-save">${isEdit ? 'Guardar cambios' : 'Crear evento'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(back);
+  back.querySelectorAll('.color-swatch').forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      back.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected'); chosen = sw.dataset.color;
+    });
+  });
+  document.getElementById('ev-cancel').onclick = ()=>back.remove();
+  back.addEventListener('click', e=>{ if(e.target===back) back.remove(); });
+  document.getElementById('ev-save').onclick = async ()=>{
+    const name = document.getElementById('ev-name').value.trim();
+    const eventDate = document.getElementById('ev-date').value;
+    if(!name){ showToast('Poné un nombre para el evento'); return; }
+    if(isEdit){
+      existingEvent.name = name;
+      existingEvent.eventDate = eventDate;
+      existingEvent.color = chosen;
+    } else {
+      const ev = {id:uid(), name, eventDate, color:chosen, createdAt:Date.now()};
+      events.push(ev);
+      itemsCache[ev.id] = [];
+    }
+    await safeSet('events', events, true);
+    back.remove();
+    render();
+  };
+  setTimeout(()=>document.getElementById('ev-name').focus(), 50);
+}
+
+/* ---------- Event view (items) ---------- */
+function renderEventView(items){
+  const ev = events.find(e=>e.id===state.eventId);
+  const rows = items.length ? items.map(it=>{
+    const st = statusInfo(it.status);
+    const overdue = isOverdue(it.dueDate, it.status);
+    const metaBits = [];
+    if(it.assignee) metaBits.push(`<span class="chip">👤 ${esc(it.assignee)}</span>`);
+    if(it.dueDate) metaBits.push(`<span class="chip ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>`);
+    return `
+      <div class="item-block">
+        <div class="item-row" data-id="${it.id}">
+          <button class="btn-icon toggle-btn" data-toggle="${it.id}" title="Más información">▾</button>
+          <div class="title">${esc(it.title)}</div>
+          <div class="item-meta">${metaBits.join('')}</div>
+          <span class="status-pill" style="background:${st.color}22;color:${st.color}">
+            <span class="dot" style="background:${st.color}"></span>${st.label}
+          </span>
+          <button class="btn-icon" data-del-item="${it.id}" title="Eliminar item">✕</button>
+        </div>
+        <div class="item-expand" id="expand-${it.id}"></div>
+      </div>`;
+  }).join('') : `<div class="empty-state">No hay items todavía. Agregá el primero para empezar el seguimiento.</div>`;
+
+  const alert = eventAlert(ev.eventDate);
+  let eventBadge = '';
+  if(alert.level==='red') eventBadge = `<span class="countdown-pill" style="background:#E23D4622;color:var(--alert-red)">⚠ Faltan ${alert.days} día${alert.days===1?'':'s'} para el evento</span>`;
+  else if(alert.level==='yellow') eventBadge = `<span class="countdown-pill" style="background:#F5A40022;color:var(--alert-yellow)">⏳ Faltan ${alert.days} días para el evento</span>`;
+  else if(alert.level==='past') eventBadge = `<span class="countdown-pill" style="background:#E9EEF1;color:var(--text-soft)">Evento pasado</span>`;
+  else if(alert.days!==null) eventBadge = `<span class="countdown-pill" style="background:#E9EEF1;color:var(--text-soft)">Faltan ${alert.days} días para el evento</span>`;
+
+  return `
+    <div class="crumb">
+      <button id="crumb-menu">Eventos</button><span class="sep">/</span><span class="current">${esc(ev.name)}</span>
+    </div>
+    <div class="section-head">
+      <h2>${esc(ev.name)}</h2>
+      <button class="btn btn-primary" id="btn-new-item">+ Nuevo item</button>
+    </div>
+    ${eventBadge ? `<div style="margin-bottom:16px">${eventBadge}</div>` : ''}
+    <div class="items-list">${rows}</div>
+  `;
+}
+
+function bindEventView(){
+  document.getElementById('crumb-menu').onclick = ()=>{ state.view='menu'; render(); };
+  document.getElementById('btn-new-item').onclick = ()=>openItemModal();
+  document.querySelectorAll('.item-row').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-del-item]') || e.target.closest('[data-toggle]')) return;
+      state.view='item'; state.itemId=row.dataset.id; render();
+    });
+  });
+  document.querySelectorAll('[data-del-item]').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.delItem;
+      if(!confirm('¿Eliminar este item?')) return;
+      itemsCache[state.eventId] = itemsCache[state.eventId].filter(i=>i.id!==id);
+      await saveItemsFor(state.eventId);
+      render();
+    });
+  });
+  document.querySelectorAll('[data-toggle]').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.toggle;
+      const panel = document.getElementById('expand-'+id);
+      const isOpen = panel.classList.contains('show');
+      if(isOpen){
+        panel.classList.remove('show');
+        panel.innerHTML = '';
+        btn.textContent = '▾';
+        return;
+      }
+      btn.textContent = '▴';
+      panel.classList.add('show');
+      panel.innerHTML = '<div style="padding:4px 0;">Cargando…</div>';
+      const it = itemsCache[state.eventId].find(i=>i.id===id);
+      const detail = (await safeGet('itemdetail:'+state.eventId+':'+id, true)) || {content:''};
+      panel.innerHTML = renderExpandContent(it, detail);
+    });
+  });
+  document.querySelector('.items-list').addEventListener('click', (e)=>{
+    const link = e.target.closest('[data-open-item]');
+    if(link){ state.view='item'; state.itemId=link.dataset.openItem; render(); }
+  });
+}
+
+function renderExpandContent(it, detail){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = detail.content || '';
+  let previewText = tmp.textContent.trim();
+  const isPlaceholder = previewText === 'Escribí la descripción acá...';
+  if(isPlaceholder) previewText = '';
+  const imgCount = (detail.content && detail.content.match(/<img/g) || []).length;
+  if(previewText.length > 240) previewText = previewText.slice(0,240) + '…';
+  const created = it.createdAt ? new Date(it.createdAt).toLocaleDateString('es-AR') : '—';
+  return `
+    <div class="expand-row"><b>Responsable</b><span>${it.assignee ? esc(it.assignee) : 'Sin asignar'}</span></div>
+    <div class="expand-row"><b>Fecha límite</b><span>${it.dueDate ? formatDate(it.dueDate) : 'Sin definir'}</span></div>
+    <div class="expand-row"><b>Creado</b><span>${created}</span></div>
+    ${imgCount ? `<div class="expand-row"><b>Imágenes</b><span>${imgCount}</span></div>` : ''}
+    <div class="expand-preview">${previewText ? esc(previewText) : '<i>Todavía no hay descripción cargada.</i>'}</div>
+    <button class="expand-link" data-open-item="${it.id}">Abrir item completo →</button>
+  `;
+}
+
+function openItemModal(){
+  const back = document.createElement('div');
+  back.className='modal-backdrop';
+  back.innerHTML = `
+    <div class="modal">
+      <h3>Nuevo item</h3>
+      <label>Título</label>
+      <input type="text" id="it-title" placeholder="Ej: Diseño de invitación" />
+      <label>Responsable (opcional)</label>
+      <input type="text" id="it-assignee" placeholder="Ej: María" />
+      <label>Fecha límite (opcional)</label>
+      <input type="date" id="it-due" />
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="it-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="it-save">Crear item</button>
+      </div>
+    </div>`;
+  document.body.appendChild(back);
+  document.getElementById('it-cancel').onclick = ()=>back.remove();
+  back.addEventListener('click', e=>{ if(e.target===back) back.remove(); });
+  document.getElementById('it-save').onclick = async ()=>{
+    const title = document.getElementById('it-title').value.trim();
+    const assignee = document.getElementById('it-assignee').value.trim();
+    const dueDate = document.getElementById('it-due').value;
+    if(!title){ showToast('Poné un título para el item'); return; }
+    const it = {id:uid(), title, status:'pendiente', assignee, dueDate, createdAt:Date.now()};
+    itemsCache[state.eventId] = itemsCache[state.eventId] || [];
+    itemsCache[state.eventId].push(it);
+    await saveItemsFor(state.eventId);
+    back.remove();
+    state.view='item'; state.itemId=it.id; render();
+  };
+  setTimeout(()=>document.getElementById('it-title').focus(), 50);
+}
+
+/* ---------- Item detail view ---------- */
+function renderItemView(item, detail){
+  const ev = events.find(e=>e.id===state.eventId);
+  const statusButtons = STATUSES.map(s=>`
+    <div class="status-opt ${item.status===s.id?'active':''}" data-status="${s.id}"
+         style="background:${s.color}22;color:${s.color}">
+      <span class="dot" style="background:${s.color}"></span>${s.label}
+    </div>`).join('');
+
+  return `
+    <div class="crumb">
+      <button id="crumb-menu">Eventos</button><span class="sep">/</span>
+      <button id="crumb-event">${esc(ev.name)}</button><span class="sep">/</span>
+      <span class="current">${esc(item.title)}</span>
+    </div>
+    <div class="item-detail-card">
+      <input class="item-title-input" id="item-title-input" value="${esc(item.title)}" />
+      <div class="status-row">
+        <label>Estado</label>
+        <div class="status-options" id="status-options">${statusButtons}</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-field">
+          <label>Responsable</label>
+          <input type="text" id="item-assignee-input" placeholder="Sin asignar" value="${esc(item.assignee||'')}" />
+        </div>
+        <div class="meta-field">
+          <label>Fecha límite</label>
+          <input type="date" id="item-due-input" value="${item.dueDate||''}" />
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="tb-btn" data-cmd="bold" title="Negrita"><b>B</b></button>
+        <button class="tb-btn" data-cmd="italic" title="Cursiva"><i>I</i></button>
+        <button class="tb-btn" data-cmd="underline" title="Subrayado"><u>S</u></button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" data-cmd="highlight" title="Resaltar">🖍 Resaltar</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" data-cmd="insertUnorderedList" title="Lista">• Lista</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" id="btn-insert-img" title="Insertar imagen">🖼 Imagen</button>
+        <input type="file" id="file-img" accept="image/*" style="display:none">
+      </div>
+      <div class="editor" id="editor" contenteditable="true">${detail.content || '<p>Escribí la descripción acá...</p>'}</div>
+      <div class="save-flag" id="save-flag">Guardado ✓</div>
+    </div>
+  `;
+}
+
+function bindItemView(detail){
+  document.getElementById('crumb-menu').onclick = ()=>{ state.view='menu'; render(); };
+  document.getElementById('crumb-event').onclick = ()=>{ state.view='event'; render(); };
+
+  const titleInput = document.getElementById('item-title-input');
+  titleInput.addEventListener('change', async ()=>{
+    const items = itemsCache[state.eventId];
+    const it = items.find(i=>i.id===state.itemId);
+    it.title = titleInput.value.trim() || it.title;
+    await saveItemsFor(state.eventId);
+    flashSaved();
+  });
+
+  document.getElementById('item-assignee-input').addEventListener('change', async (e)=>{
+    const items = itemsCache[state.eventId];
+    const it = items.find(i=>i.id===state.itemId);
+    it.assignee = e.target.value.trim();
+    await saveItemsFor(state.eventId);
+    flashSaved();
+  });
+  document.getElementById('item-due-input').addEventListener('change', async (e)=>{
+    const items = itemsCache[state.eventId];
+    const it = items.find(i=>i.id===state.itemId);
+    it.dueDate = e.target.value;
+    await saveItemsFor(state.eventId);
+    flashSaved();
+  });
+
+  document.querySelectorAll('.status-opt').forEach(opt=>{
+    opt.addEventListener('click', async ()=>{
+      const items = itemsCache[state.eventId];
+      const it = items.find(i=>i.id===state.itemId);
+      it.status = opt.dataset.status;
+      await saveItemsFor(state.eventId);
+      document.querySelectorAll('.status-opt').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      flashSaved();
+    });
+  });
+
+  const editor = document.getElementById('editor');
+  editor.addEventListener('focus', ()=>{
+    if(editor.textContent.trim()==='Escribí la descripción acá...'){ editor.innerHTML=''; }
+  });
+  editor.addEventListener('mouseup', saveSelectionRange);
+  editor.addEventListener('keyup', saveSelectionRange);
+
+  let saveTimer=null;
+  editor.addEventListener('input', ()=>{
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async ()=>{
+      await safeSet('itemdetail:'+state.eventId+':'+state.itemId, {content: editor.innerHTML}, true);
+      flashSaved();
+    }, 600);
+  });
+
+  document.querySelectorAll('.tb-btn[data-cmd]').forEach(btn=>{
+    btn.addEventListener('mousedown', (e)=>e.preventDefault()); // keep selection
+    btn.addEventListener('click', ()=>{
+      editor.focus();
+      restoreSelectionRange();
+      const cmd = btn.dataset.cmd;
+      if(cmd==='highlight'){
+        applyHighlight();
+      } else {
+        document.execCommand(cmd, false, null);
+      }
+      saveSelectionRange();
+      triggerEditorSave(editor);
+    });
+  });
+
+  document.getElementById('btn-insert-img').addEventListener('mousedown', e=>e.preventDefault());
+  document.getElementById('btn-insert-img').addEventListener('click', ()=>{
+    document.getElementById('file-img').click();
+  });
+  document.getElementById('file-img').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(file) insertImageFile(file, editor);
+    e.target.value = '';
+  });
+  editor.addEventListener('paste', (e)=>{
+    const items = e.clipboardData && e.clipboardData.items;
+    if(!items) return;
+    for(const it of items){
+      if(it.type && it.type.indexOf('image')===0){
+        e.preventDefault();
+        const file = it.getAsFile();
+        insertImageFile(file, editor);
+        return;
+      }
+    }
+  });
+}
+
+function saveSelectionRange(){
+  const sel = window.getSelection();
+  if(sel.rangeCount>0) savedRange = sel.getRangeAt(0);
+}
+function restoreSelectionRange(){
+  if(!savedRange) return;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  try{ sel.addRange(savedRange); }catch(e){}
+}
+function applyHighlight(){
+  const sel = window.getSelection();
+  if(!sel.rangeCount || sel.isCollapsed) return;
+  const range = sel.getRangeAt(0);
+  const mark = document.createElement('mark');
+  try{
+    range.surroundContents(mark);
+  }catch(e){
+    // fallback for partial-node selections
+    const contents = range.extractContents();
+    mark.appendChild(contents);
+    range.insertNode(mark);
+  }
+  sel.removeAllRanges();
+}
+function insertImageFile(file, editor){
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    editor.focus();
+    restoreSelectionRange();
+    document.execCommand('insertImage', false, reader.result);
+    triggerEditorSave(editor);
+  };
+  reader.readAsDataURL(file);
+}
+function triggerEditorSave(editor){
+  safeSet('itemdetail:'+state.eventId+':'+state.itemId, {content: editor.innerHTML}, true).then(flashSaved);
+}
+function flashSaved(){
+  const f = document.getElementById('save-flag');
+  if(!f) return;
+  f.classList.add('show');
+  clearTimeout(flashSaved._t);
+  flashSaved._t = setTimeout(()=>f.classList.remove('show'), 1500);
+}
+
+/* ---------- Init ---------- */
+(async function init(){
+  await loadEvents();
+  await preloadItemCounts();
+  render();
+})();
+</script>
+</body>
+</html>
