@@ -132,11 +132,36 @@
   .expand-row{display:flex;gap:8px;margin-bottom:6px;}
   .expand-row b{color:var(--text);font-weight:600;min-width:100px;flex-shrink:0;}
   .expand-preview{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);line-height:1.5;}
+  .expand-content-preview{
+    max-height:220px;overflow-y:auto;line-height:1.55;font-size:13px;color:var(--text);
+  }
+  .expand-content-preview img{max-width:100%;border-radius:6px;margin:6px 0;display:block;}
+  .expand-content-preview ul{padding-left:18px;margin:4px 0;}
+  .expand-content-preview mark{background:#FFE38A;padding:0 2px;border-radius:2px;}
+  .expand-content-preview p{margin:0 0 6px;}
   .expand-link{
     display:inline-block;margin-top:10px;color:var(--azul-principal);font-weight:600;font-size:12.5px;
     cursor:pointer;background:none;border:none;font-family:inherit;padding:0;
   }
   .expand-link:hover{text-decoration:underline;}
+  .expand-edit-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;}
+  .expand-field{display:flex;flex-direction:column;gap:3px;}
+  .expand-field label{font-size:10.5px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.3px;}
+  .expand-field input{
+    font-family:inherit;font-size:12.5px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--line);
+    background:#fff;color:var(--text);width:150px;
+  }
+  .expand-field input:focus{outline:none;border-color:var(--azul-principal);}
+
+  .quick-add{
+    display:flex;gap:8px;margin-bottom:14px;background:var(--card);border-radius:12px;
+    box-shadow:var(--shadow);padding:10px;
+  }
+  .quick-add input{
+    flex:1;border:none;font-family:inherit;font-size:14.5px;padding:8px 10px;background:none;color:var(--text);
+  }
+  .quick-add input:focus{outline:none;}
+  .quick-add input::placeholder{color:#9AACB6;}
 
   /* Modal */
   .modal-backdrop{
@@ -516,16 +541,36 @@ function renderEventView(items){
     </div>
     <div class="section-head">
       <h2>${esc(ev.name)}</h2>
-      <button class="btn btn-primary" id="btn-new-item">+ Nuevo item</button>
     </div>
     ${eventBadge ? `<div style="margin-bottom:16px">${eventBadge}</div>` : ''}
+    <div class="quick-add">
+      <input type="text" id="quick-add-input" placeholder="Escribí un item y presioná Enter para agregarlo..." />
+      <button class="btn btn-primary" id="quick-add-btn">+ Agregar</button>
+    </div>
     <div class="items-list">${rows}</div>
   `;
 }
 
 function bindEventView(){
   document.getElementById('crumb-menu').onclick = ()=>{ state.view='menu'; render(); };
-  document.getElementById('btn-new-item').onclick = ()=>openItemModal();
+
+  const quickInput = document.getElementById('quick-add-input');
+  const quickAdd = async ()=>{
+    const title = quickInput.value.trim();
+    if(!title) return;
+    const it = {id:uid(), title, status:'pendiente', assignee:'', dueDate:'', createdAt:Date.now()};
+    itemsCache[state.eventId] = itemsCache[state.eventId] || [];
+    itemsCache[state.eventId].push(it);
+    await saveItemsFor(state.eventId);
+    quickInput.value = '';
+    render();
+  };
+  document.getElementById('quick-add-btn').addEventListener('click', quickAdd);
+  quickInput.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); quickAdd(); }
+  });
+  quickInput.focus();
+
   document.querySelectorAll('.item-row').forEach(row=>{
     row.addEventListener('click', (e)=>{
       if(e.target.closest('[data-del-item]') || e.target.closest('[data-toggle]')) return;
@@ -566,60 +611,61 @@ function bindEventView(){
     const link = e.target.closest('[data-open-item]');
     if(link){ state.view='item'; state.itemId=link.dataset.openItem; render(); }
   });
+  document.querySelector('.items-list').addEventListener('change', async (e)=>{
+    const aInput = e.target.closest('[data-expand-assignee]');
+    const dInput = e.target.closest('[data-expand-due]');
+    if(aInput){
+      const it = itemsCache[state.eventId].find(i=>i.id===aInput.dataset.expandAssignee);
+      it.assignee = aInput.value.trim();
+      await saveItemsFor(state.eventId);
+      refreshItemRowMeta(it.id);
+    } else if(dInput){
+      const it = itemsCache[state.eventId].find(i=>i.id===dInput.dataset.expandDue);
+      it.dueDate = dInput.value;
+      await saveItemsFor(state.eventId);
+      refreshItemRowMeta(it.id);
+    }
+  });
+}
+
+function refreshItemRowMeta(id){
+  const it = itemsCache[state.eventId].find(i=>i.id===id);
+  const row = document.querySelector(`.item-row[data-id="${id}"]`);
+  if(!it || !row) return;
+  const overdue = isOverdue(it.dueDate, it.status);
+  const metaBits = [];
+  if(it.assignee) metaBits.push(`<span class="chip">👤 ${esc(it.assignee)}</span>`);
+  if(it.dueDate) metaBits.push(`<span class="chip ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>`);
+  const metaEl = row.querySelector('.item-meta');
+  if(metaEl) metaEl.innerHTML = metaBits.join('');
 }
 
 function renderExpandContent(it, detail){
   const tmp = document.createElement('div');
   tmp.innerHTML = detail.content || '';
-  let previewText = tmp.textContent.trim();
-  const isPlaceholder = previewText === 'Escribí la descripción acá...';
-  if(isPlaceholder) previewText = '';
+  const plainText = tmp.textContent.trim();
+  const isPlaceholder = plainText === 'Escribí la descripción acá...';
+  const hasContent = detail.content && !isPlaceholder && plainText.length > 0;
   const imgCount = (detail.content && detail.content.match(/<img/g) || []).length;
-  if(previewText.length > 240) previewText = previewText.slice(0,240) + '…';
-  const created = it.createdAt ? new Date(it.createdAt).toLocaleDateString('es-AR') : '—';
   return `
-    <div class="expand-row"><b>Responsable</b><span>${it.assignee ? esc(it.assignee) : 'Sin asignar'}</span></div>
-    <div class="expand-row"><b>Fecha límite</b><span>${it.dueDate ? formatDate(it.dueDate) : 'Sin definir'}</span></div>
-    <div class="expand-row"><b>Creado</b><span>${created}</span></div>
-    ${imgCount ? `<div class="expand-row"><b>Imágenes</b><span>${imgCount}</span></div>` : ''}
-    <div class="expand-preview">${previewText ? esc(previewText) : '<i>Todavía no hay descripción cargada.</i>'}</div>
+    <div class="expand-edit-row">
+      <div class="expand-field">
+        <label>Responsable</label>
+        <input type="text" data-expand-assignee="${it.id}" placeholder="Sin asignar" value="${esc(it.assignee||'')}" />
+      </div>
+      <div class="expand-field">
+        <label>Fecha límite</label>
+        <input type="date" data-expand-due="${it.id}" value="${it.dueDate||''}" />
+      </div>
+      ${imgCount ? `<div class="expand-field"><label>Imágenes</label><span style="font-size:12.5px;padding-top:4px;">${imgCount}</span></div>` : ''}
+    </div>
+    <div class="expand-preview">
+      ${hasContent
+        ? `<div class="expand-content-preview">${detail.content}</div>`
+        : `<i>Todavía no hay descripción cargada.</i>`}
+    </div>
     <button class="expand-link" data-open-item="${it.id}">Abrir item completo →</button>
   `;
-}
-
-function openItemModal(){
-  const back = document.createElement('div');
-  back.className='modal-backdrop';
-  back.innerHTML = `
-    <div class="modal">
-      <h3>Nuevo item</h3>
-      <label>Título</label>
-      <input type="text" id="it-title" placeholder="Ej: Diseño de invitación" />
-      <label>Responsable (opcional)</label>
-      <input type="text" id="it-assignee" placeholder="Ej: María" />
-      <label>Fecha límite (opcional)</label>
-      <input type="date" id="it-due" />
-      <div class="modal-actions">
-        <button class="btn btn-ghost" id="it-cancel">Cancelar</button>
-        <button class="btn btn-primary" id="it-save">Crear item</button>
-      </div>
-    </div>`;
-  document.body.appendChild(back);
-  document.getElementById('it-cancel').onclick = ()=>back.remove();
-  back.addEventListener('click', e=>{ if(e.target===back) back.remove(); });
-  document.getElementById('it-save').onclick = async ()=>{
-    const title = document.getElementById('it-title').value.trim();
-    const assignee = document.getElementById('it-assignee').value.trim();
-    const dueDate = document.getElementById('it-due').value;
-    if(!title){ showToast('Poné un título para el item'); return; }
-    const it = {id:uid(), title, status:'pendiente', assignee, dueDate, createdAt:Date.now()};
-    itemsCache[state.eventId] = itemsCache[state.eventId] || [];
-    itemsCache[state.eventId].push(it);
-    await saveItemsFor(state.eventId);
-    back.remove();
-    state.view='item'; state.itemId=it.id; render();
-  };
-  setTimeout(()=>document.getElementById('it-title').focus(), 50);
 }
 
 /* ---------- Item detail view ---------- */
