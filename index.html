@@ -91,7 +91,7 @@
   }
   .event-card:hover{transform:translateY(-3px);}
   .card-actions{position:absolute;top:12px;right:10px;display:flex;gap:2px;}
-  .event-card h3{margin:0 0 4px;font-size:16px;font-weight:700;padding-right:44px;}
+  .event-card h3{margin:0 0 4px;font-size:16px;font-weight:700;padding-right:66px;}
   .event-card .meta{font-size:12.5px;color:var(--text-soft);margin-bottom:10px;}
   .countdown-pill{
     display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;
@@ -113,16 +113,49 @@
     padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;
   }
   .item-row:hover{outline:1.5px solid var(--cyan);}
-  .item-row .title{flex:1;font-weight:600;font-size:14.5px;min-width:120px;}
+  .item-row .title{flex:1;font-weight:600;font-size:14.5px;min-width:120px;cursor:text;}
+  .title-inline-input{
+    flex:1;font-weight:600;font-size:14.5px;min-width:120px;font-family:inherit;
+    border:none;border-bottom:2px solid var(--cyan);background:none;color:var(--text);padding:0 0 1px;
+  }
+  .title-inline-input:focus{outline:none;}
   .item-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--text-soft);white-space:nowrap;}
-  .item-meta .chip{display:inline-flex;align-items:center;gap:4px;}
-  .item-meta .chip.overdue{color:var(--fucsia);font-weight:700;}
+  .chip{display:inline-flex;align-items:center;gap:4px;}
+  .chip.overdue{color:var(--fucsia);font-weight:700;}
   .status-pill{
     font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;
-    display:inline-flex;align-items:center;gap:6px;
+    display:inline-flex;align-items:center;gap:6px;border:none;font-family:inherit;cursor:pointer;
   }
+  .status-pill:hover{filter:brightness(0.95);}
   .status-pill .dot{width:7px;height:7px;border-radius:50%;}
-  .toggle-btn{flex-shrink:0;}
+  .status-wrap{position:relative;flex-shrink:0;}
+  .priority-wrap{position:relative;flex-shrink:0;}
+  .priority-pill{
+    font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px;white-space:nowrap;
+    border:none;font-family:inherit;cursor:pointer;
+  }
+  .priority-pill:hover{filter:brightness(0.95);}
+  .status-menu{
+    position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1.5px solid var(--line);
+    border-radius:10px;box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;gap:2px;
+    z-index:30;min-width:150px;
+  }
+  .status-menu-item{
+    display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;cursor:pointer;
+    font-size:12.5px;font-weight:600;background:none;border:none;font-family:inherit;text-align:left;color:var(--text);
+  }
+  .status-menu-item:hover{background:#F0F4F6;}
+  .status-menu-item .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .toggle-btn{
+    flex-shrink:0;width:26px;height:26px;padding:0;border:none;border-radius:50%;
+    background:#EEF3F6;color:var(--text-soft);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease, color .15s ease;
+  }
+  .toggle-btn:hover{background:#DDEBEF;color:var(--azul-principal);}
+  .toggle-btn svg{width:13px;height:13px;transition:transform .2s ease;}
+  .toggle-btn.open{background:var(--azul-principal);color:#fff;}
+  .toggle-btn.open svg{transform:rotate(180deg);}
   .item-block{display:flex;flex-direction:column;}
   .item-expand{
     display:none;background:#FAFBFC;border:1.5px solid var(--line);border-top:none;
@@ -132,13 +165,26 @@
   .expand-row{display:flex;gap:8px;margin-bottom:6px;}
   .expand-row b{color:var(--text);font-weight:600;min-width:100px;flex-shrink:0;}
   .expand-preview{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);line-height:1.5;}
-  .expand-content-preview{
-    max-height:220px;overflow-y:auto;line-height:1.55;font-size:13px;color:var(--text);
+  .expand-content-view{
+    max-height:240px;overflow-y:auto;line-height:1.55;font-size:13px;color:var(--text);cursor:default;
   }
+  .expand-content-view img{max-width:100%;border-radius:6px;margin:6px 0;display:block;}
+  .expand-content-view ul{padding-left:18px;margin:4px 0;}
+  .expand-content-view mark{background:#FFE38A;padding:0 2px;border-radius:2px;}
+  .expand-content-view p{margin:0 0 6px;}
+  .expand-content-view.empty{color:var(--text-soft);font-style:italic;font-size:12.5px;}
+  .expand-content-preview{
+    max-height:240px;overflow-y:auto;line-height:1.55;font-size:13px;color:var(--text);
+    border:1.5px solid var(--line);border-top:none;border-radius:0 0 8px 8px;
+    padding:10px 12px;background:#fff;cursor:text;
+  }
+  .expand-content-preview:focus{outline:none;}
   .expand-content-preview img{max-width:100%;border-radius:6px;margin:6px 0;display:block;}
   .expand-content-preview ul{padding-left:18px;margin:4px 0;}
   .expand-content-preview mark{background:#FFE38A;padding:0 2px;border-radius:2px;}
   .expand-content-preview p{margin:0 0 6px;}
+  .item-expand .toolbar{border-radius:8px 8px 0 0;}
+  .toolbar-sm .save-flag{margin:0 0 0 auto;align-self:center;}
   .expand-link{
     display:inline-block;margin-top:10px;color:var(--azul-principal);font-weight:600;font-size:12.5px;
     cursor:pointer;background:none;border:none;font-family:inherit;padding:0;
@@ -162,6 +208,27 @@
   }
   .quick-add input:focus{outline:none;}
   .quick-add input::placeholder{color:#9AACB6;}
+
+  .search-bar{margin-bottom:12px;}
+  .search-bar input{
+    width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);
+    font-family:inherit;font-size:13.5px;background:#fff;color:var(--text);
+  }
+  .search-bar input:focus{outline:none;border-color:var(--azul-principal);}
+
+  .event-card.archived{opacity:.6;}
+  .event-card.archived:hover{opacity:.85;}
+  .archived-toggle-wrap{margin-top:24px;}
+
+  .reorder-list{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;margin-bottom:20px;}
+  .reorder-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);
+    border-radius:10px;background:#fff;cursor:grab;font-size:13.5px;
+  }
+  .reorder-item.dragging{opacity:.35;}
+  .reorder-handle{color:var(--text-soft);font-size:15px;letter-spacing:-2px;user-select:none;}
+  .reorder-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .reorder-title{flex:1;font-weight:600;}
 
   /* Modal */
   .modal-backdrop{
@@ -253,11 +320,17 @@
 const STATUSES = [
   {id:'pendiente', label:'Pendiente', color:'#94A3B8'},
   {id:'en_curso',  label:'En curso',  color:'#00C4DF'},
+  {id:'en_produccion', label:'En producción', color:'#00528F'},
   {id:'revision',  label:'Revisión',  color:'#ff436e'},
   {id:'listo',     label:'Listo',     color:'#008091'}
 ];
 const EVENT_COLORS = ['#00528F','#008091','#ff436e','#00C4DF','#002447'];
 const AREAS = ['Retail','Affinity','Brokers','GSA','Chile','Colombia','Panama','Mexico'];
+const PRIORITIES = [
+  {id:'alta',  label:'Alta',  color:'#E23D46'},
+  {id:'media', label:'Media', color:'#F5A400'},
+  {id:'baja',  label:'Baja',  color:'#94A3B8'}
+];
 
 let state = { view:'menu', eventId:null, itemId:null };
 let events = [];
@@ -293,6 +366,7 @@ async function safeSet(key, value){
 }
 
 function statusInfo(id){ return STATUSES.find(s=>s.id===id) || STATUSES[0]; }
+function priorityInfo(id){ return PRIORITIES.find(p=>p.id===id) || PRIORITIES[1]; }
 
 function formatDate(iso){
   if(!iso) return '';
@@ -366,20 +440,12 @@ async function render(){
 }
 
 /* ---------- Menu (events) ---------- */
-function renderMenu(){
-  if(!events.length){
-    return `
-      <div class="section-head"><h2>Eventos</h2>
-        <button class="btn btn-primary" id="btn-new-event">+ Nuevo evento</button>
-      </div>
-      <div class="empty-state">Todavía no hay eventos cargados.<br>Creá el primero para empezar a hacer seguimiento.</div>
-    `;
-  }
-  const cards = events.map(ev=>{
-    const items = itemsCache[ev.id] || [];
+function renderEventCard(ev, archived){
+  const items = itemsCache[ev.id] || [];
+  let borderColor = archived ? '#C9D2D8' : ev.color;
+  let pill = '';
+  if(!archived){
     const alert = eventAlert(ev.eventDate);
-    let borderColor = ev.color;
-    let pill = '';
     if(alert.level==='red'){
       borderColor = 'var(--alert-red)';
       pill = `<span class="countdown-pill" style="background:#E23D4622;color:var(--alert-red)">⚠ Faltan ${alert.days} día${alert.days===1?'':'s'}</span>`;
@@ -391,23 +457,48 @@ function renderMenu(){
     } else if(alert.days!==null){
       pill = `<span class="countdown-pill" style="background:#E9EEF1;color:var(--text-soft)">Faltan ${alert.days} días</span>`;
     }
+  }
+  const actions = archived
+    ? `<button class="btn-icon" data-unarchive-event="${ev.id}" title="Restaurar">↺</button>
+       <button class="btn-icon" data-del-event="${ev.id}" title="Eliminar definitivamente">✕</button>`
+    : `<button class="btn-icon" data-edit-event="${ev.id}" title="Editar evento">✎</button>
+       <button class="btn-icon" data-archive-event="${ev.id}" title="Archivar evento">📦</button>
+       <button class="btn-icon" data-del-event="${ev.id}" title="Eliminar evento">✕</button>`;
+  return `
+    <div class="event-card ${archived?'archived':''}" style="border-top-color:${borderColor}" data-id="${ev.id}">
+      <div class="card-actions">${actions}</div>
+      <h3>${esc(ev.name)}</h3>
+      ${ev.area ? `<span class="area-tag">${esc(ev.area)}</span>` : ''}
+      <div class="meta">${items.length} item${items.length===1?'':'s'}</div>
+      ${pill}
+    </div>`;
+}
+
+function renderMenu(){
+  if(!events.length){
     return `
-      <div class="event-card" style="border-top-color:${borderColor}" data-id="${ev.id}">
-        <div class="card-actions">
-          <button class="btn-icon" data-edit-event="${ev.id}" title="Editar evento">✎</button>
-          <button class="btn-icon" data-del-event="${ev.id}" title="Eliminar evento">✕</button>
-        </div>
-        <h3>${esc(ev.name)}</h3>
-        ${ev.area ? `<span class="area-tag">${esc(ev.area)}</span>` : ''}
-        <div class="meta">${items.length} item${items.length===1?'':'s'}</div>
-        ${pill}
-      </div>`;
-  }).join('');
+      <div class="section-head"><h2>Eventos</h2>
+        <button class="btn btn-primary" id="btn-new-event">+ Nuevo evento</button>
+      </div>
+      <div class="empty-state">Todavía no hay eventos cargados.<br>Creá el primero para empezar a hacer seguimiento.</div>
+    `;
+  }
+  const activeEvents = events.filter(e=>!e.archived);
+  const archivedEvents = events.filter(e=>e.archived);
+  const cards = activeEvents.map(ev=>renderEventCard(ev, false)).join('');
+  const archivedSection = archivedEvents.length ? `
+    <div class="archived-toggle-wrap">
+      <button class="btn btn-ghost" id="toggle-archived">📦 Ver archivados (${archivedEvents.length})</button>
+      <div class="events-grid" id="archived-grid" style="display:none;margin-top:16px;">
+        ${archivedEvents.map(ev=>renderEventCard(ev, true)).join('')}
+      </div>
+    </div>` : '';
   return `
     <div class="section-head"><h2>Eventos</h2>
       <button class="btn btn-primary" id="btn-new-event">+ Nuevo evento</button>
     </div>
-    <div class="events-grid">${cards}</div>
+    ${activeEvents.length ? `<div class="events-grid">${cards}</div>` : `<div class="empty-state">No hay eventos activos. Creá uno nuevo o mirá los archivados.</div>`}
+    ${archivedSection}
   `;
 }
 
@@ -430,6 +521,34 @@ function bindMenu(){
       openEventModal(ev);
     });
   });
+  document.querySelectorAll('[data-archive-event]').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const ev = events.find(x=>x.id===btn.dataset.archiveEvent);
+      ev.archived = true;
+      await safeSet('events', events, true);
+      render();
+    });
+  });
+  document.querySelectorAll('[data-unarchive-event]').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const ev = events.find(x=>x.id===btn.dataset.unarchiveEvent);
+      ev.archived = false;
+      await safeSet('events', events, true);
+      render();
+    });
+  });
+  const toggleArchived = document.getElementById('toggle-archived');
+  if(toggleArchived){
+    toggleArchived.addEventListener('click', ()=>{
+      const grid = document.getElementById('archived-grid');
+      const hidden = grid.style.display === 'none';
+      grid.style.display = hidden ? 'grid' : 'none';
+      const count = events.filter(e=>e.archived).length;
+      toggleArchived.textContent = hidden ? '📦 Ocultar archivados' : `📦 Ver archivados (${count})`;
+    });
+  }
   document.querySelectorAll('[data-del-event]').forEach(btn=>{
     btn.addEventListener('click', async (e)=>{
       e.stopPropagation();
@@ -506,20 +625,29 @@ function renderEventView(items){
   const ev = events.find(e=>e.id===state.eventId);
   const rows = items.length ? items.map(it=>{
     const st = statusInfo(it.status);
+    const pr = priorityInfo(it.priority);
     const overdue = isOverdue(it.dueDate, it.status);
-    const dueBadge = it.dueDate ? `<span class="chip due-badge ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>` : '';
     const metaBits = [];
     if(it.assignee) metaBits.push(`<span class="chip">👤 ${esc(it.assignee)}</span>`);
+    if(it.dueDate) metaBits.push(`<span class="chip ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>`);
     return `
       <div class="item-block">
         <div class="item-row" data-id="${it.id}">
-          <button class="btn-icon toggle-btn" data-toggle="${it.id}" title="Más información">▾</button>
-          <div class="title">${esc(it.title)}</div>
-          ${dueBadge}
+          <button class="toggle-btn" data-toggle="${it.id}" title="Más información">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="title" data-title="${it.id}">${esc(it.title)}</div>
           <div class="item-meta">${metaBits.join('')}</div>
-          <span class="status-pill" style="background:${st.color}22;color:${st.color}">
-            <span class="dot" style="background:${st.color}"></span>${st.label}
-          </span>
+          <div class="priority-wrap">
+            <button class="priority-pill" data-priority-pill="${it.id}" style="background:${pr.color}22;color:${pr.color}" title="Prioridad">${pr.label}</button>
+          </div>
+          <div class="status-wrap">
+            <button class="status-pill" data-status-pill="${it.id}" style="background:${st.color}22;color:${st.color}">
+              <span class="dot" style="background:${st.color}"></span>${st.label}
+            </button>
+          </div>
           <button class="btn-icon" data-del-item="${it.id}" title="Eliminar item">✕</button>
         </div>
         <div class="item-expand" id="expand-${it.id}"></div>
@@ -539,24 +667,33 @@ function renderEventView(items){
     </div>
     <div class="section-head">
       <h2>${esc(ev.name)}</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" id="btn-reorder">⇅ Reordenar</button>
+        <button class="btn btn-ghost" id="btn-export-xlsx">⬇ Excel</button>
+        <button class="btn btn-ghost" id="btn-export-pdf">⬇ PDF</button>
+      </div>
     </div>
     ${eventBadge ? `<div style="margin-bottom:16px">${eventBadge}</div>` : ''}
     <div class="quick-add">
       <input type="text" id="quick-add-input" placeholder="Escribí un item y presioná Enter para agregarlo..." />
       <button class="btn btn-primary" id="quick-add-btn">+ Agregar</button>
     </div>
-    <div class="items-list">${rows}</div>
+    <div class="search-bar">
+      <input type="text" id="item-search-input" placeholder="🔍 Buscar items por título o responsable..." />
+    </div>
+    <div class="items-list" id="items-list">${rows}</div>
   `;
 }
 
 function bindEventView(){
+  const ev = events.find(e=>e.id===state.eventId);
   document.getElementById('crumb-menu').onclick = ()=>{ state.view='menu'; render(); };
 
   const quickInput = document.getElementById('quick-add-input');
   const quickAdd = async ()=>{
     const title = quickInput.value.trim();
     if(!title) return;
-    const it = {id:uid(), title, status:'pendiente', assignee:'', dueDate:'', createdAt:Date.now()};
+    const it = {id:uid(), title, status:'pendiente', priority:'media', assignee:'', dueDate:'', createdAt:Date.now()};
     itemsCache[state.eventId] = itemsCache[state.eventId] || [];
     itemsCache[state.eventId].push(it);
     await saveItemsFor(state.eventId);
@@ -569,10 +706,90 @@ function bindEventView(){
   });
   quickInput.focus();
 
+  const searchInput = document.getElementById('item-search-input');
+  searchInput.addEventListener('input', ()=>{
+    const q = searchInput.value.trim().toLowerCase();
+    document.querySelectorAll('.item-block').forEach(block=>{
+      const id = block.querySelector('.item-row').dataset.id;
+      const it = itemsCache[state.eventId].find(i=>i.id===id);
+      if(!it) return;
+      const text = (it.title + ' ' + (it.assignee||'')).toLowerCase();
+      block.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+  });
+
+  document.getElementById('btn-reorder').addEventListener('click', openReorderModal);
+  document.getElementById('btn-export-xlsx').addEventListener('click', ()=>{
+    exportEventExcel(ev, itemsCache[state.eventId] || []);
+  });
+  document.getElementById('btn-export-pdf').addEventListener('click', ()=>{
+    exportEventPdf(ev, itemsCache[state.eventId] || []);
+  });
+
   document.querySelectorAll('.item-row').forEach(row=>{
     row.addEventListener('click', (e)=>{
-      if(e.target.closest('[data-del-item]') || e.target.closest('[data-toggle]')) return;
+      if(e.target.closest('[data-del-item]') || e.target.closest('[data-toggle]') || e.target.closest('.title') || e.target.closest('.status-wrap') || e.target.closest('.priority-wrap')) return;
       state.view='item'; state.itemId=row.dataset.id; render();
+    });
+  });
+  document.querySelectorAll('.title[data-title]').forEach(titleEl=>{
+    titleEl.addEventListener('dblclick', (e)=>{
+      e.stopPropagation();
+      startInlineTitleEdit(titleEl);
+    });
+  });
+  document.querySelectorAll('[data-status-pill]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const wrap = btn.closest('.status-wrap');
+      const already = wrap.querySelector('.status-menu');
+      closeAllStatusMenus();
+      if(already) return;
+      const id = btn.dataset.statusPill;
+      const it = itemsCache[state.eventId].find(i=>i.id===id);
+      const menu = document.createElement('div');
+      menu.className = 'status-menu';
+      menu.innerHTML = STATUSES.map(s=>`
+        <button class="status-menu-item" data-set-status="${s.id}">
+          <span class="dot" style="background:${s.color}"></span>${s.label}
+        </button>`).join('');
+      wrap.appendChild(menu);
+      menu.querySelectorAll('[data-set-status]').forEach(opt=>{
+        opt.addEventListener('click', async (e2)=>{
+          e2.stopPropagation();
+          it.status = opt.dataset.setStatus;
+          await saveItemsFor(state.eventId);
+          menu.remove();
+          refreshItemRowStatus(id);
+        });
+      });
+    });
+  });
+  document.querySelectorAll('[data-priority-pill]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const wrap = btn.closest('.priority-wrap');
+      const already = wrap.querySelector('.status-menu');
+      closeAllStatusMenus();
+      if(already) return;
+      const id = btn.dataset.priorityPill;
+      const it = itemsCache[state.eventId].find(i=>i.id===id);
+      const menu = document.createElement('div');
+      menu.className = 'status-menu';
+      menu.innerHTML = PRIORITIES.map(p=>`
+        <button class="status-menu-item" data-set-priority="${p.id}">
+          <span class="dot" style="background:${p.color}"></span>${p.label}
+        </button>`).join('');
+      wrap.appendChild(menu);
+      menu.querySelectorAll('[data-set-priority]').forEach(opt=>{
+        opt.addEventListener('click', async (e2)=>{
+          e2.stopPropagation();
+          it.priority = opt.dataset.setPriority;
+          await saveItemsFor(state.eventId);
+          menu.remove();
+          refreshItemRowPriority(id);
+        });
+      });
     });
   });
   document.querySelectorAll('[data-del-item]').forEach(btn=>{
@@ -594,15 +811,17 @@ function bindEventView(){
       if(isOpen){
         panel.classList.remove('show');
         panel.innerHTML = '';
-        btn.textContent = '▾';
+        btn.classList.remove('open');
         return;
       }
-      btn.textContent = '▴';
+      btn.classList.add('open');
       panel.classList.add('show');
       panel.innerHTML = '<div style="padding:4px 0;">Cargando…</div>';
       const it = itemsCache[state.eventId].find(i=>i.id===id);
       const detail = (await safeGet('itemdetail:'+state.eventId+':'+id, true)) || {content:''};
       panel.innerHTML = renderExpandContent(it, detail);
+      const body = panel.querySelector('[data-expand-body]');
+      bindExpandViewDblClick(it, body);
     });
   });
   document.querySelector('.items-list').addEventListener('click', (e)=>{
@@ -626,35 +845,359 @@ function bindEventView(){
   });
 }
 
+function startInlineTitleEdit(titleEl){
+  const id = titleEl.dataset.title;
+  const it = itemsCache[state.eventId].find(i=>i.id===id);
+  if(!it) return;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'title-inline-input';
+  input.value = it.title;
+  titleEl.replaceWith(input);
+  input.focus();
+  input.select();
+  input.addEventListener('click', e=>e.stopPropagation());
+  let done = false;
+  const finish = async ()=>{
+    if(done) return;
+    done = true;
+    const newVal = input.value.trim();
+    if(newVal && newVal !== it.title){
+      it.title = newVal;
+      await saveItemsFor(state.eventId);
+      showToast('Título actualizado ✓');
+    }
+    const div = document.createElement('div');
+    div.className = 'title';
+    div.dataset.title = id;
+    div.textContent = it.title;
+    div.addEventListener('dblclick', (e)=>{ e.stopPropagation(); startInlineTitleEdit(div); });
+    input.replaceWith(div);
+  };
+  input.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); input.blur(); }
+    if(e.key==='Escape'){ input.value = it.title; input.blur(); }
+  });
+  input.addEventListener('blur', finish);
+}
+
+function bindExpandViewDblClick(it, body){
+  const viewEl = body.querySelector('[data-expand-view]');
+  if(!viewEl) return;
+  viewEl.addEventListener('dblclick', (e)=>{
+    e.stopPropagation();
+    expandEnterEdit(it, body);
+  });
+}
+
+function expandViewMarkup(itemId, html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  const plainText = tmp.textContent.trim();
+  const isPlaceholder = plainText === 'Escribí la descripción acá...';
+  const hasContent = html && !isPlaceholder && plainText.length > 0;
+  return hasContent
+    ? `<div class="expand-content-view" data-expand-view="${itemId}">${html}</div>`
+    : `<div class="expand-content-view empty" data-expand-view="${itemId}"><i>Todavía no hay descripción cargada. Doble clic para escribir.</i></div>`;
+}
+
+function expandEditorMarkup(itemId, startingHtml){
+  return `
+    <div class="expand-edit-wrap" data-expand-wrap="${itemId}" tabindex="-1">
+      <div class="toolbar toolbar-sm">
+        <button class="tb-btn" data-ecmd="bold" title="Negrita"><b>B</b></button>
+        <button class="tb-btn" data-ecmd="italic" title="Cursiva"><i>I</i></button>
+        <button class="tb-btn" data-ecmd="underline" title="Subrayado"><u>S</u></button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" data-ecmd="highlight" title="Resaltar">🖍</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" data-ecmd="insertUnorderedList" title="Lista">• Lista</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" data-expand-img="${itemId}" title="Insertar imagen">🖼</button>
+        <input type="file" data-expand-file="${itemId}" accept="image/*" style="display:none">
+        <span class="save-flag" data-expand-saved="${itemId}">Guardado ✓</span>
+      </div>
+      <div class="expand-content-preview" contenteditable="true" data-expand-editor="${itemId}">${startingHtml || '<p style="color:#9AACB6">Escribí la descripción acá...</p>'}</div>
+    </div>
+  `;
+}
+
+function expandEnterEdit(it, body){
+  const viewEl = body.querySelector('[data-expand-view]');
+  const isEmpty = viewEl && viewEl.classList.contains('empty');
+  const currentHtml = (viewEl && !isEmpty) ? viewEl.innerHTML : '';
+  body.innerHTML = expandEditorMarkup(it.id, currentHtml);
+  expandWireEditor(it, body);
+  const ed = body.querySelector('[data-expand-editor]');
+  ed.focus();
+  placeCaretAtEnd(ed);
+}
+
+function placeCaretAtEnd(el){
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function expandWireEditor(it, body){
+  const wrap = body.querySelector('[data-expand-wrap]');
+  const editor = wrap.querySelector('[data-expand-editor]');
+  const key = 'itemdetail:'+state.eventId+':'+it.id;
+  const savedFlag = wrap.querySelector('[data-expand-saved]');
+  const flash = ()=>{
+    if(!savedFlag) return;
+    savedFlag.classList.add('show');
+    clearTimeout(flash._t);
+    flash._t = setTimeout(()=>savedFlag.classList.remove('show'), 1500);
+  };
+  const saveHtml = async ()=>{
+    const html = editor.innerHTML;
+    if(html.length > 850000){ showToast('⚠ La descripción está muy pesada (muchas imágenes). Considerá sacar alguna.'); }
+    await safeSet(key, {content: html}, true);
+    flash();
+  };
+  editor.addEventListener('focus', ()=>{
+    if(editor.textContent.trim()==='Escribí la descripción acá...'){ editor.innerHTML=''; }
+  });
+  editor.addEventListener('mouseup', saveSelectionRange);
+  editor.addEventListener('keyup', saveSelectionRange);
+  let saveTimer=null;
+  editor.addEventListener('input', ()=>{
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveHtml, 600);
+  });
+  wrap.querySelectorAll('.tb-btn[data-ecmd]').forEach(btn=>{
+    btn.addEventListener('mousedown', e=>e.preventDefault());
+    btn.addEventListener('click', ()=>{
+      editor.focus();
+      restoreSelectionRange();
+      const cmd = btn.dataset.ecmd;
+      if(cmd==='highlight') applyHighlight();
+      else document.execCommand(cmd, false, null);
+      saveSelectionRange();
+      saveHtml();
+    });
+  });
+  const imgBtn = wrap.querySelector('[data-expand-img]');
+  const fileInput = wrap.querySelector('[data-expand-file]');
+  if(imgBtn && fileInput){
+    imgBtn.addEventListener('mousedown', e=>e.preventDefault());
+    imgBtn.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(file) insertImageFile(file, editor, saveHtml);
+      e.target.value = '';
+    });
+  }
+  editor.addEventListener('paste', (e)=>{
+    const items = e.clipboardData && e.clipboardData.items;
+    if(!items) return;
+    for(const itc of items){
+      if(itc.type && itc.type.indexOf('image')===0){
+        e.preventDefault();
+        insertImageFile(itc.getAsFile(), editor, saveHtml);
+        return;
+      }
+    }
+  });
+  wrap.addEventListener('focusout', ()=>{
+    setTimeout(()=>{
+      if(!wrap.contains(document.activeElement)){
+        const html = editor.innerHTML;
+        body.innerHTML = expandViewMarkup(it.id, html);
+        bindExpandViewDblClick(it, body);
+      }
+    }, 0);
+  });
+}
+
+function loadScript(src){
+  return new Promise((resolve, reject)=>{
+    if(document.querySelector(`script[src="${src}"]`)){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = ()=>resolve();
+    s.onerror = ()=>reject(new Error('No se pudo cargar '+src));
+    document.body.appendChild(s);
+  });
+}
+
+async function exportEventExcel(ev, items){
+  try{
+    showToast('Generando Excel…');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+    const rows = items.map(it=>({
+      'Item': it.title,
+      'Estado': statusInfo(it.status).label,
+      'Prioridad': priorityInfo(it.priority).label,
+      'Responsable': it.assignee || '',
+      'Fecha límite': it.dueDate ? formatDate(it.dueDate) : ''
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{'Item':'(sin items)','Estado':'','Prioridad':'','Responsable':'','Fecha límite':''}]);
+    ws['!cols'] = [{wch:38},{wch:16},{wch:12},{wch:22},{wch:14}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Seguimiento');
+    const filename = `UA_${ev.name.replace(/[^a-zA-Z0-9]+/g,'_')}_seguimiento.xlsx`;
+    XLSX.writeFile(wb, filename);
+  }catch(err){
+    console.error(err);
+    showToast('⚠ No se pudo generar el Excel. Revisá tu conexión.');
+  }
+}
+
+async function exportEventPdf(ev, items){
+  try{
+    showToast('Generando PDF…');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(ev.name, 14, 18);
+    let sub = [];
+    if(ev.area) sub.push('Área: '+ev.area);
+    if(ev.eventDate) sub.push('Fecha del evento: '+formatDate(ev.eventDate));
+    doc.setFontSize(10);
+    doc.setTextColor(90,107,120);
+    if(sub.length) doc.text(sub.join('   ·   '), 14, 25);
+    doc.setTextColor(15,34,51);
+    let y = 36;
+    items.forEach((it,i)=>{
+      if(y > 280){ doc.addPage(); y = 20; }
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'bold');
+      doc.text(`${i+1}. ${it.title}`, 14, y);
+      doc.setFont(undefined, 'normal');
+      const details = [`Estado: ${statusInfo(it.status).label}`, `Prioridad: ${priorityInfo(it.priority).label}`];
+      if(it.assignee) details.push(`Responsable: ${it.assignee}`);
+      if(it.dueDate) details.push(`Vence: ${formatDate(it.dueDate)}`);
+      doc.setFontSize(9);
+      doc.text(details.join('   ·   '), 18, y+5);
+      y += 12;
+    });
+    if(!items.length){ doc.setFontSize(11); doc.text('Este evento todavía no tiene items cargados.', 14, y); }
+    const filename = `UA_${ev.name.replace(/[^a-zA-Z0-9]+/g,'_')}_seguimiento.pdf`;
+    doc.save(filename);
+  }catch(err){
+    console.error(err);
+    showToast('⚠ No se pudo generar el PDF. Revisá tu conexión.');
+  }
+}
+
+function closeAllStatusMenus(){
+  document.querySelectorAll('.status-menu').forEach(m=>m.remove());
+}
+
+function openReorderModal(){
+  const items = itemsCache[state.eventId] || [];
+  const back = document.createElement('div');
+  back.className = 'modal-backdrop';
+  back.innerHTML = `
+    <div class="modal" style="max-width:480px;">
+      <h3>Reordenar items</h3>
+      <div class="reorder-list" id="reorder-list">
+        ${items.map(it=>`
+          <div class="reorder-item" draggable="true" data-id="${it.id}">
+            <span class="reorder-handle">⋮⋮</span>
+            <span class="reorder-dot" style="background:${statusInfo(it.status).color}"></span>
+            <span class="reorder-title">${esc(it.title)}</span>
+          </div>`).join('') || '<div style="color:var(--text-soft);font-size:13.5px;">No hay items para reordenar.</div>'}
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="reorder-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="reorder-save">Guardar orden</button>
+      </div>
+    </div>`;
+  document.body.appendChild(back);
+  document.getElementById('reorder-cancel').onclick = ()=>back.remove();
+  back.addEventListener('click', e=>{ if(e.target===back) back.remove(); });
+
+  const list = document.getElementById('reorder-list');
+  let dragEl = null;
+  list.querySelectorAll('.reorder-item').forEach(el=>{
+    el.addEventListener('dragstart', ()=>{
+      dragEl = el;
+      setTimeout(()=>el.classList.add('dragging'), 0);
+    });
+    el.addEventListener('dragend', ()=>{
+      el.classList.remove('dragging');
+      dragEl = null;
+    });
+  });
+  list.addEventListener('dragover', (e)=>{
+    e.preventDefault();
+    if(!dragEl) return;
+    const after = getDragAfterElement(list, e.clientY);
+    if(after == null) list.appendChild(dragEl);
+    else list.insertBefore(dragEl, after);
+  });
+
+  document.getElementById('reorder-save').onclick = async ()=>{
+    const newIds = Array.from(list.querySelectorAll('.reorder-item')).map(el=>el.dataset.id);
+    if(newIds.length){
+      const reordered = newIds.map(id=>items.find(i=>i.id===id)).filter(Boolean);
+      itemsCache[state.eventId] = reordered;
+      await saveItemsFor(state.eventId);
+    }
+    back.remove();
+    render();
+  };
+}
+
+function getDragAfterElement(container, y){
+  const els = [...container.querySelectorAll('.reorder-item:not(.dragging)')];
+  return els.reduce((closest, child)=>{
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    if(offset < 0 && offset > closest.offset) return {offset, element: child};
+    return closest;
+  }, {offset:-Infinity}).element;
+}
+
+function refreshItemRowPriority(id){
+  const it = itemsCache[state.eventId].find(i=>i.id===id);
+  const row = document.querySelector(`.item-row[data-id="${id}"]`);
+  if(!it || !row) return;
+  const pr = priorityInfo(it.priority);
+  const pill = row.querySelector('.priority-pill');
+  if(pill){
+    pill.style.background = pr.color+'22';
+    pill.style.color = pr.color;
+    pill.textContent = pr.label;
+  }
+}
+
+function refreshItemRowStatus(id){
+  const it = itemsCache[state.eventId].find(i=>i.id===id);
+  const row = document.querySelector(`.item-row[data-id="${id}"]`);
+  if(!it || !row) return;
+  const st = statusInfo(it.status);
+  const pill = row.querySelector('.status-pill');
+  if(pill){
+    pill.style.background = st.color+'22';
+    pill.style.color = st.color;
+    pill.innerHTML = `<span class="dot" style="background:${st.color}"></span>${st.label}`;
+  }
+  refreshItemRowMeta(id);
+}
+
 function refreshItemRowMeta(id){
   const it = itemsCache[state.eventId].find(i=>i.id===id);
   const row = document.querySelector(`.item-row[data-id="${id}"]`);
   if(!it || !row) return;
   const overdue = isOverdue(it.dueDate, it.status);
-  const dueBadge = it.dueDate ? `<span class="chip due-badge ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>` : '';
-  const existingDue = row.querySelector('.due-badge');
-  if(existingDue) existingDue.outerHTML = dueBadge;
-  else if(dueBadge) row.querySelector('.title').insertAdjacentHTML('afterend', dueBadge);
   const metaBits = [];
   if(it.assignee) metaBits.push(`<span class="chip">👤 ${esc(it.assignee)}</span>`);
+  if(it.dueDate) metaBits.push(`<span class="chip ${overdue?'overdue':''}">${overdue?'⚠':'📅'} ${formatDate(it.dueDate)}</span>`);
   const metaEl = row.querySelector('.item-meta');
   if(metaEl) metaEl.innerHTML = metaBits.join('');
 }
 
 function renderExpandContent(it, detail){
-  const tmp = document.createElement('div');
-  tmp.innerHTML = detail.content || '';
-  const plainText = tmp.textContent.trim();
-  const isPlaceholder = plainText === 'Escribí la descripción acá...';
-  const hasContent = detail.content && !isPlaceholder && plainText.length > 0;
-  const imgCount = (detail.content && detail.content.match(/<img/g) || []).length;
   return `
-    ${imgCount ? `<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:8px;">🖼 ${imgCount} imagen${imgCount===1?'':'es'}</div>` : ''}
-    <div class="expand-preview" style="${imgCount?'margin-top:0;padding-top:0;border-top:none;':''}">
-      ${hasContent
-        ? `<div class="expand-content-preview">${detail.content}</div>`
-        : `<i>Todavía no hay descripción cargada.</i>`}
-    </div>
+    <div class="expand-body" data-expand-body="${it.id}">${expandViewMarkup(it.id, detail.content)}</div>
     <button class="expand-link" data-open-item="${it.id}">Abrir item completo →</button>
   `;
 }
@@ -666,6 +1209,11 @@ function renderItemView(item, detail){
     <div class="status-opt ${item.status===s.id?'active':''}" data-status="${s.id}"
          style="background:${s.color}22;color:${s.color}">
       <span class="dot" style="background:${s.color}"></span>${s.label}
+    </div>`).join('');
+  const priorityButtons = PRIORITIES.map(p=>`
+    <div class="status-opt ${(item.priority||'media')===p.id?'active':''}" data-priority="${p.id}"
+         style="background:${p.color}22;color:${p.color}">
+      <span class="dot" style="background:${p.color}"></span>${p.label}
     </div>`).join('');
 
   return `
@@ -679,6 +1227,10 @@ function renderItemView(item, detail){
       <div class="status-row">
         <label>Estado</label>
         <div class="status-options" id="status-options">${statusButtons}</div>
+      </div>
+      <div class="status-row">
+        <label>Prioridad</label>
+        <div class="status-options" id="priority-options">${priorityButtons}</div>
       </div>
       <div class="meta-row">
         <div class="meta-field">
@@ -736,13 +1288,24 @@ function bindItemView(detail){
     flashSaved();
   });
 
-  document.querySelectorAll('.status-opt').forEach(opt=>{
+  document.querySelectorAll('.status-opt[data-status]').forEach(opt=>{
     opt.addEventListener('click', async ()=>{
       const items = itemsCache[state.eventId];
       const it = items.find(i=>i.id===state.itemId);
       it.status = opt.dataset.status;
       await saveItemsFor(state.eventId);
-      document.querySelectorAll('.status-opt').forEach(o=>o.classList.remove('active'));
+      document.querySelectorAll('#status-options .status-opt').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      flashSaved();
+    });
+  });
+  document.querySelectorAll('.status-opt[data-priority]').forEach(opt=>{
+    opt.addEventListener('click', async ()=>{
+      const items = itemsCache[state.eventId];
+      const it = items.find(i=>i.id===state.itemId);
+      it.priority = opt.dataset.priority;
+      await saveItemsFor(state.eventId);
+      document.querySelectorAll('#priority-options .status-opt').forEach(o=>o.classList.remove('active'));
       opt.classList.add('active');
       flashSaved();
     });
@@ -830,7 +1393,7 @@ function applyHighlight(){
   }
   sel.removeAllRanges();
 }
-function insertImageFile(file, editor){
+function insertImageFile(file, editor, onSave){
   const reader = new FileReader();
   reader.onload = ()=>{
     const img = new Image();
@@ -846,7 +1409,7 @@ function insertImageFile(file, editor){
       editor.focus();
       restoreSelectionRange();
       document.execCommand('insertImage', false, dataUrl);
-      triggerEditorSave(editor);
+      if(onSave) onSave(); else triggerEditorSave(editor);
     };
     img.src = reader.result;
   };
@@ -866,6 +1429,11 @@ function flashSaved(){
 }
 
 /* ---------- Init ---------- */
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.status-wrap')){
+    closeAllStatusMenus();
+  }
+});
 (async function init(){
   await loadEvents();
   await preloadItemCounts();
